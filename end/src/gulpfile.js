@@ -5,7 +5,7 @@ var autoprefixer = require('gulp-autoprefixer');
 var concat = require('gulp-concat');
 var sourcemaps = require('gulp-sourcemaps');
 var uglify = require('gulp-uglify');
-
+var browserSync = require('browser-sync').create();
 
 // static css variables
 var srcScss = 'scss/style.scss';
@@ -46,7 +46,8 @@ gulp.task('sass', function(){
     })) // Converts Sass to Css with gulp sass
     .pipe(concat(minCss))
     .pipe(sourcemaps.write('./maps'))
-    .pipe(gulp.dest(distCss));
+    .pipe(gulp.dest(distCss))
+    .pipe(browserSync.stream());
 });
 
 gulp.task('vendor-css', function(){
@@ -76,7 +77,8 @@ gulp.task('main-js', function(){
    .pipe(uglify())
    .pipe(concat(minMainJs))
    .pipe(sourcemaps.write('./maps'))
-   .pipe(gulp.dest(distMainJs));
+   .pipe(gulp.dest(distMainJs))
+   .pipe(browserSync.stream());
 });
 
 gulp.task('vendor-js', function(){
@@ -86,3 +88,19 @@ gulp.task('vendor-js', function(){
    .pipe(gulp.dest(distVendorJs));
 });
 // /Scripts
+
+// browserSync
+gulp.task('browserSync', function() {
+    browserSync.init({
+        server: {
+            baseDir: '../'
+        }
+    });
+    
+    gulp.watch("scss/*.scss", ['sass']);
+    gulp.watch("js/*.js", ['main-js']);
+});
+
+gulp.task('default', ['browserSync'], function (){
+    gulp.watch('../index.html', browserSync.reload);
+});
